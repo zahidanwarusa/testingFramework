@@ -1,0 +1,10 @@
+2024-11-22 19:03:36.429 [main] INFO  com.umr.apitesting.utils.LoggerUtil - Loaded configuration for environment: dev
+2024-11-22 19:03:36.448 [main] INFO  com.umr.apitesting.utils.LoggerUtil - Successfully loaded base URL: https://dev-api.example.com
+2024-11-22 19:03:36.909 [main] INFO  com.umr.apitesting.utils.LoggerUtil - Executing GET request to https://jsonplaceholder.typicode.com/posts/1
+2024-11-22 19:03:37.807 [main] INFO  com.umr.apitesting.utils.LoggerUtil - Response Status: 200
+2024-11-22 19:03:37.812 [main] INFO  com.umr.apitesting.utils.LoggerUtil - Starting API test verification
+2024-11-22 19:03:37.887 [main] INFO  com.umr.apitesting.utils.LoggerUtil - API test verification completed successfully
+2024-11-22 19:03:46.186 [main] INFO  com.umr.apitesting.utils.LoggerUtil - Loaded configuration for environment: dev
+2024-11-22 19:03:46.207 [main] INFO  com.umr.apitesting.utils.LoggerUtil - Successfully loaded base URL: https://dev-api.example.com
+2024-11-22 19:03:46.620 [main] INFO  com.umr.apitesting.utils.LoggerUtil - Executing GET request to https://jsonplaceholder.typicode.com/posts/1
+2024-11-22 19:03:47.513 [main] INFO  com.umr.apitesting.utils.LoggerUtil - Response Status: 200
