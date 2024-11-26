@@ -56,6 +56,9 @@ public class RestClientBuilder {
 		try {
 			RequestSpecification request = RestAssured.given();
 
+			LoggerUtil.logInfo("Making request to: " + baseUrl + endpoint);
+			LoggerUtil.logInfo("Headers: " + headers);
+
 			// Add headers
 			headers.forEach(request::header);
 
