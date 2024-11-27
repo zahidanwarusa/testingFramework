@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.umr.apitesting.utils.LoggerUtil;
 
 public class ConfigManager {
-	private static final String CONFIG_PATH = "src/main/resources/config/";
+	public static final String CONFIG_PATH = "src/main/resources/config/";
 	private static final ConcurrentHashMap<String, Properties> envProperties = new ConcurrentHashMap<>();
 	private static String currentEnvironment;
 

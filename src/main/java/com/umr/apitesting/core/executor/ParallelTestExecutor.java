@@ -40,21 +40,24 @@ public class ParallelTestExecutor {
 	private void executeTest(Map<String, String> test) {
 		String testId = test.get("TestID");
 		String testName = test.get("TestName");
+		String description = test.get("Description");
 
 		try {
-			ExtentReportManager.startTest(testId, testName);
+			ExtentReportManager.startTest(testId, testName, description != null ? description : "");
 			LoggerUtil.logInfo("Executing test: " + testId + " - " + testName);
 
 			TestExecutor executor = new TestExecutor(testDataPath);
 			executor.executeTest(testId);
 
 			passed.incrementAndGet();
-			ExtentReportManager.logPass("Test " + testId + " PASSED");
+			ExtentReportManager.logKeywordResult(true, "Test " + testId + " completed successfully");
 			LoggerUtil.logInfo("Test " + testId + " PASSED");
 		} catch (Exception e) {
 			failed.incrementAndGet();
-			ExtentReportManager.logFail("Test " + testId + " FAILED", e);
+			ExtentReportManager.logError("Test " + testId + " failed", e);
 			LoggerUtil.logError("Test " + testId + " FAILED", e);
+		} finally {
+			ExtentReportManager.endTest();
 		}
 	}
 

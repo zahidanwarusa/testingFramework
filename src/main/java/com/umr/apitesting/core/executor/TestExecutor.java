@@ -1,5 +1,6 @@
 package com.umr.apitesting.core.executor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -65,7 +66,22 @@ public class TestExecutor {
 		ExcelReader reader = new ExcelReader(testDataPath);
 		reader.setSheet("Keywords");
 
-		return reader.readData().stream().filter(row -> row.get("TestID").equals(testId)).map(row -> row.get("Keyword"))
-				.toList();
+		List<Map<String, String>> data = reader.readData();
+		Map<String, String> testRow = data.stream().filter(row -> testId.equals(row.get("TestID"))).findFirst()
+				.orElseThrow(() -> new RuntimeException("Keywords not found for test: " + testId));
+
+		// Create ordered list of keywords
+		List<String> keywords = new ArrayList<>();
+		for (int i = 1;; i++) {
+			String key = "Keyword" + i;
+			String keyword = testRow.get(key);
+			if (keyword == null || keyword.trim().isEmpty()) {
+				break;
+			}
+			keywords.add(keyword.trim());
+		}
+
+		LoggerUtil.logInfo("Keywords for test " + testId + ": " + keywords);
+		return keywords;
 	}
 }

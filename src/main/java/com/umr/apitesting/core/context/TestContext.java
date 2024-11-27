@@ -14,6 +14,7 @@ public class TestContext {
 	private Response apiResponse;
 	private final AtomicInteger retryCount;
 	private final Map<String, Object> sharedData;
+	private boolean authRequired;
 
 	public TestContext(String testId) {
 		this.testId = testId;
@@ -21,6 +22,7 @@ public class TestContext {
 		this.runtimeData = new HashMap<>();
 		this.sharedData = new ConcurrentHashMap<>();
 		this.retryCount = new AtomicInteger(0);
+		this.authRequired = true; // Default to requiring auth
 	}
 
 	public String getTestId() {
@@ -29,6 +31,9 @@ public class TestContext {
 
 	public void setTestData(String key, Object value) {
 		testData.put(key, value);
+		if ("AuthRequired".equals(key)) {
+			this.authRequired = "Y".equalsIgnoreCase(value.toString());
+		}
 	}
 
 	public Object getTestData(String key) {
@@ -65,5 +70,13 @@ public class TestContext {
 
 	public Object getSharedData(String key) {
 		return sharedData.get(key);
+	}
+
+	public boolean isAuthRequired() {
+		return authRequired;
+	}
+
+	public void setAuthRequired(boolean required) {
+		this.authRequired = required;
 	}
 }
