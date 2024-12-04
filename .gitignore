@@ -95,3 +95,4 @@ allure-report/
 .Trashes
 ehthumbs.db
 Thumbs.db
+target/

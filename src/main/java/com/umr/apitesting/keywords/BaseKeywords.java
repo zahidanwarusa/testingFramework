@@ -3,6 +3,7 @@ package com.umr.apitesting.keywords;
 import com.umr.apitesting.core.context.TestContext;
 import com.umr.apitesting.core.executor.APIExecutor;
 import com.umr.apitesting.reporting.ExtentReportManager;
+import com.umr.apitesting.utils.JsonUtils;
 import com.umr.apitesting.utils.LoggerUtil;
 
 public class BaseKeywords {
@@ -11,9 +12,12 @@ public class BaseKeywords {
 	public boolean executeAPI(TestContext context) {
 		ExtentReportManager.startKeyword("API_CALL");
 		try {
+
+			String requestBodyJson = JsonUtils.makeJson((String) context.getTestData("RequestBodyKey"),
+					(String) context.getTestData("RequestBodyValue"));
 			APIExecutor executor = new APIExecutor(context);
 			executor.executeAPI((String) context.getTestData("BaseURL"), (String) context.getTestData("Endpoint"),
-					(String) context.getTestData("Method"), context.getTestData("RequestBody"));
+					(String) context.getTestData("Method"), requestBodyJson);
 			ExtentReportManager.logKeywordResult(true, "API call executed successfully");
 			return true;
 		} catch (Exception e) {
