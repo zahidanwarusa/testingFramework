@@ -2,19 +2,29 @@ package com.umr.apitesting.core.executor;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.umr.apitesting.core.service.EmailService;
 import com.umr.apitesting.reporting.ExtentReportManager;
 import com.umr.apitesting.utils.LoggerUtil;
 
+@Component
 public class ParallelTestExecutor {
 	private final AtomicInteger passed = new AtomicInteger(0);
 	private final AtomicInteger failed = new AtomicInteger(0);
 	private final String testDataPath;
 	private final int threadCount;
+	private final Map<String, String> failedTests = new ConcurrentHashMap<>();
+
+	@Autowired
+	private EmailService emailService;
 
 	public ParallelTestExecutor(String testDataPath, int threadCount) {
 		this.testDataPath = testDataPath;
@@ -54,6 +64,7 @@ public class ParallelTestExecutor {
 			LoggerUtil.logInfo("Test " + testId + " PASSED");
 		} catch (Exception e) {
 			failed.incrementAndGet();
+			failedTests.put(testId, e.getMessage());
 			ExtentReportManager.logError("Test " + testId + " failed", e);
 			LoggerUtil.logError("Test " + testId + " FAILED", e);
 		} finally {
@@ -67,5 +78,9 @@ public class ParallelTestExecutor {
 
 	public int getFailedCount() {
 		return failed.get();
+	}
+
+	public Map<String, String> getFailedTests() {
+		return failedTests;
 	}
 }

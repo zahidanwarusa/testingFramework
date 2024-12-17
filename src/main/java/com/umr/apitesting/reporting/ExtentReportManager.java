@@ -158,4 +158,9 @@ public class ExtentReportManager {
 			LoggerUtil.logInfo("Detailed test report generated: " + reportPath);
 		}
 	}
+
+	public static String getReportPath() {
+		// TODO Auto-generated method stub
+		return reportPath;
+	}
 }
