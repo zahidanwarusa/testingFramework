@@ -1,6 +1,5 @@
 package com.umr.apitesting.core.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -8,17 +7,20 @@ import com.umr.apitesting.core.executor.ParallelTestExecutor;
 
 @Configuration
 public class TestConfig {
-	@Autowired
-	private ConfigManager configManager;
+	private final ConfigManager configManager;
+
+	public TestConfig(ConfigManager configManager) { // Constructor injection
+		this.configManager = configManager;
+	}
 
 	@Bean
 	public String testDataPath() {
-		return ConfigManager.getProperty("test.suite.path");
+		return configManager.getProperty("test.suite.path");
 	}
 
 	@Bean
 	public Integer threadCount() {
-		return Integer.parseInt(ConfigManager.getProperty("test.thread.count"));
+		return Integer.parseInt(configManager.getProperty("test.thread.count"));
 	}
 
 	@Bean
