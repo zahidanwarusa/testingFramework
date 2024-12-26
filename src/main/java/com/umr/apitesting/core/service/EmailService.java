@@ -6,7 +6,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -18,11 +17,15 @@ import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class EmailService {
+
 	@Autowired
 	private JavaMailSender mailSender;
 
 	@Autowired
 	private EmailConfig emailConfig;
+
+	private static final int MAX_RETRIES = 3;
+	private static final long RETRY_DELAY = 2000; // 2 seconds
 
 	public void sendTestExecutionReport(String reportPath, Map<String, Object> executionStats) {
 		if (!emailConfig.isEnabled()) {
@@ -30,42 +33,56 @@ public class EmailService {
 			return;
 		}
 
-		try {
-			MimeMessage message = mailSender.createMimeMessage();
-			MimeMessageHelper helper = new MimeMessageHelper(message, true);
+		int retries = 0;
+		Exception lastException = null;
 
-			helper.setFrom(emailConfig.getFrom());
-			helper.setTo(emailConfig.getRecipients());
-			helper.setSubject(formatSubject());
+		while (retries < MAX_RETRIES) {
+			try {
+				sendEmail(reportPath, executionStats);
+				LoggerUtil.logInfo("Test execution report email sent successfully");
+				return;
+			} catch (Exception e) {
+				lastException = e;
+				retries++;
+				LoggerUtil.logWarning("Email send attempt " + retries + " failed, retrying ...");
 
-			String content = createEmailContent(executionStats);
-			helper.setText(content, true);
-
-			File reportFile = new File(reportPath);
-			if (reportFile.exists()) {
-				helper.addAttachment("TestExecutionReport.html", reportFile);
-			}
-
-			// Add retry mechanism
-			int maxRetries = 3;
-			int retryCount = 0;
-			while (retryCount < maxRetries) {
-				try {
-					mailSender.send(message);
-					LoggerUtil.logInfo("Test execution report email sent successfully");
-					break;
-				} catch (MailException e) {
-					retryCount++;
-					if (retryCount == maxRetries) {
-						throw e;
+				if (retries < MAX_RETRIES) {
+					try {
+						Thread.sleep(RETRY_DELAY);
+					} catch (InterruptedException ie) {
+						Thread.currentThread().interrupt();
+						break;
 					}
-					LoggerUtil.logWarning("Email send attempt " + retryCount + " failed, retrying...");
-					Thread.sleep(2000); // Wait 2 seconds before retry
 				}
 			}
-		} catch (Exception e) {
-			LoggerUtil.logError("Failed to send test execution report email", e);
 		}
+
+		LoggerUtil.logError("Failed to send test execution report email after " + MAX_RETRIES + " attempts",
+				lastException);
+		// Continue execution even if email fails
+	}
+
+	private void sendEmail(String reportPath, Map<String, Object> stats) throws Exception {
+		MimeMessage message = mailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+		// Set email metadata
+		helper.setFrom(emailConfig.getFrom());
+		helper.setTo(emailConfig.getRecipients());
+		helper.setSubject(formatSubject());
+
+		// Create email content
+		String content = createEmailContent(stats);
+		helper.setText(content, true);
+
+		// Attach report if it exists
+		File reportFile = new File(reportPath);
+		if (reportFile.exists()) {
+			helper.addAttachment("TestExecutionReport.html", reportFile);
+		}
+
+		// Send email
+		mailSender.send(message);
 	}
 
 	private String formatSubject() {
