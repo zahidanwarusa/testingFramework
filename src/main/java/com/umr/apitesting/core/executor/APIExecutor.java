@@ -19,6 +19,13 @@ public class APIExecutor {
 			RestClientBuilder builder = new RestClientBuilder().setBaseUrl(baseUrl).setEndpoint(endpoint)
 					.setMethod(method).setRequestBody(body);
 
+			// In executeAPI method
+//			RestClientBuilder builder = new RestClientBuilder()
+//			    .setBaseUrl(ConfigManager.getProperty("base.url"))
+//			    .setEndpoint(endpoint)
+//			    .setMethod(method)
+//			    .setRequestBody(body);
+
 			// Add auth token if required and available
 			if (context.getTestData("AuthRequired") != null
 					&& "Y".equalsIgnoreCase(context.getTestData("AuthRequired").toString())) {

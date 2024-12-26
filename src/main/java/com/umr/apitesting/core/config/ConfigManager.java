@@ -13,14 +13,15 @@ import jakarta.annotation.PostConstruct;
 public class ConfigManager {
 	private static final ConcurrentHashMap<String, Properties> envProperties = new ConcurrentHashMap<>();
 	private static String currentEnvironment;
+	public static final String CONFIG_PATH = "src/main/resources/config/";
 
 	@PostConstruct
 	public void init() {
-		loadEnvironmentConfig("dev"); // Default environment
+		loadEnvironmentConfig("dev");
 	}
 
-	public void loadEnvironmentConfig(String environment) {
-		String configFile = "src/main/resources/config/" + environment + ".properties";
+	public static void loadEnvironmentConfig(String environment) {
+		String configFile = CONFIG_PATH + environment + ".properties";
 		Properties props = new Properties();
 		try (FileInputStream fis = new FileInputStream(configFile)) {
 			props.load(fis);
@@ -31,7 +32,7 @@ public class ConfigManager {
 		}
 	}
 
-	public String getProperty(String key) {
+	public static String getProperty(String key) {
 		Properties props = envProperties.get(currentEnvironment);
 		if (props == null) {
 			throw new RuntimeException("No properties loaded for environment: " + currentEnvironment);

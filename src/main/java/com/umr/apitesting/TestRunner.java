@@ -39,6 +39,7 @@ public class TestRunner {
 		try {
 			// Load environment and initialize auth
 			String env = System.getProperty("env", "dev");
+			// In executeTests method
 			ConfigManager.loadEnvironmentConfig(env);
 			AuthManager.loadAuthConfig(ConfigManager.CONFIG_PATH + env + ".properties");
 

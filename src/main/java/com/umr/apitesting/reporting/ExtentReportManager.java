@@ -44,6 +44,7 @@ public class ExtentReportManager {
 			extent.attachReporter(sparkReporter);
 
 			// Add system/environment info
+			// In initializeReport method
 			extent.setSystemInfo("Environment", ConfigManager.getCurrentEnvironment());
 			extent.setSystemInfo("Base URL", ConfigManager.getProperty("base.url"));
 			extent.setSystemInfo("Java Version", System.getProperty("java.version"));
