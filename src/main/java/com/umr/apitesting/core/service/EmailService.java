@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,6 @@ import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class EmailService {
-
 	@Autowired
 	private JavaMailSender mailSender;
 
@@ -34,25 +34,35 @@ public class EmailService {
 			MimeMessage message = mailSender.createMimeMessage();
 			MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-			// Set email metadata
 			helper.setFrom(emailConfig.getFrom());
 			helper.setTo(emailConfig.getRecipients());
 			helper.setSubject(formatSubject());
 
-			// Create email content
 			String content = createEmailContent(executionStats);
 			helper.setText(content, true);
 
-			// Attach report
 			File reportFile = new File(reportPath);
 			if (reportFile.exists()) {
 				helper.addAttachment("TestExecutionReport.html", reportFile);
 			}
 
-			// Send email
-			mailSender.send(message);
-			LoggerUtil.logInfo("Test execution report email sent successfully");
-
+			// Add retry mechanism
+			int maxRetries = 3;
+			int retryCount = 0;
+			while (retryCount < maxRetries) {
+				try {
+					mailSender.send(message);
+					LoggerUtil.logInfo("Test execution report email sent successfully");
+					break;
+				} catch (MailException e) {
+					retryCount++;
+					if (retryCount == maxRetries) {
+						throw e;
+					}
+					LoggerUtil.logWarning("Email send attempt " + retryCount + " failed, retrying...");
+					Thread.sleep(2000); // Wait 2 seconds before retry
+				}
+			}
 		} catch (Exception e) {
 			LoggerUtil.logError("Failed to send test execution report email", e);
 		}

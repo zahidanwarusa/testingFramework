@@ -17,4 +17,6 @@ public class EmailConfig {
 	private String[] recipients;
 	private boolean enabled;
 	private String subject;
+	private String sslTrust; // New property
+	private String sslProtocol; // New property
 }
